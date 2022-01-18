@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: "Yikai Jing"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -22,21 +22,20 @@ The completed exercise is due on <>.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: I learned R in ENV 710 Applied Data Analysis for the Environmental and Natural Sciences and used R in ENV 723 Hydrology last semester, but this is my first time learning Git.
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: The course preparation is very detailed. 
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
-
+> Answer: The presentation of the final project. This is my second semester in the U.S. and I've never done a course presentation in English before, so I think I'll be a little nervous. But I think I'll get over my nerves and get through it.
 
 ## 2) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository  and that you have updated your course README file. 
 
-> Answer: 
+> Answer: https://github.com/Clemen-Jing/Environmental_Data_Analytics_2022
 
 
