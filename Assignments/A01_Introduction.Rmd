@@ -26,7 +26,7 @@ The completed exercise is due on <>.
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: The course preparation is very detailed. 
+> Answer: The course preparation is very detailed. I think I have more confidence in making graphs with ggplot.
 
 3. Are there any components of the course about which you feel apprehensive?
 
