@@ -44,9 +44,9 @@ Litter <- read.csv("~/Environmental_Data_Analytics_2022/Data/Raw/NEON_NIWO_Litte
 4. How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here: 
 
 > Answer: 
-*
-*
-*
+*Litter and fine woody debris sampling is executed at terrestrial NEON sites that contain woody vegetation >2m tall.
+*Locations of tower plots are selected randomly within the 90% flux footprint of the primary andsecondary airsheds (and additional areas in close proximity to the airshed, as necessary to accommodate sufficientspacing between plots).
+*Ground traps are sampled once per year. Target sampling frequency for elevated traps varies by vegetation present at the site, with frequent sampling (1x every 2weeks) in deciduous forest sites during senescence, and infrequent year-round sampling (1x every 1-2 months) at evergreen sites.
 
 
 
@@ -55,12 +55,12 @@ Litter <- read.csv("~/Environmental_Data_Analytics_2022/Data/Raw/NEON_NIWO_Litte
 5. What are the dimensions of the dataset?
 
 ```{r}
-
+dim(Neonics)
 ```
 
 6. Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 ```{r}
-
+summary(Neonics$Effect)
 ```
 
 > Answer: 
@@ -68,15 +68,19 @@ Litter <- read.csv("~/Environmental_Data_Analytics_2022/Data/Raw/NEON_NIWO_Litte
 7. Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.
 
 ```{r}
-
+summary(Neonics$Species.Common.Name)
+sort(table(Neonics$Species.Common.Name),decreasing=TRUE)[1:6]
 ```
 
-> Answer: 
+> Answer: Honey Bee, Parasitic Wasp, Buff Tailed Bumblebee, Carniolan Honey Bee, Bumble Bee, Italian Honeybee
+They are all being in the wasp-waisted Apocrita.
+They are all considered to be beneficial insects.
+
 
 8. Concentrations are always a numeric value. What is the class of Conc.1..Author. in the dataset, and why is it not numeric?
 
 ```{r}
-
+class(Neonics$Conc.1..Author.)
 ```
 
 > Answer:
