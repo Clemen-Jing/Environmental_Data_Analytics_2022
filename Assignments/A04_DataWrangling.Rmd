@@ -58,9 +58,13 @@ str(PM25.2019)
 ```{r}
 #3
 O3.2018$Date <- as.Date(O3.2018$Date, format = "%m/%d/%y")
+class(O3.2018$Date)
 O3.2019$Date <- as.Date(O3.2019$Date, format = "%m/%d/%y")
+class(O3.2019$Date)
 PM25.2018$Date <- as.Date(PM25.2018$Date, format = "%m/%d/%y")
+class(PM25.2018$Date)
 PM25.2019$Date <- as.Date(PM25.2019$Date, format = "%m/%d/%y")
+class(PM25.2019$Date)
 #4
 O3.2018.seclected <- select(O3.2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 O3.2019.seclected <- select(O3.2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
@@ -98,6 +102,7 @@ EPAair <- rbind(O3.2018.seclected, O3.2019.seclected, PM25.2018.seclected, PM25.
 EPAair.processed <- 
   EPAair %>%
   filter(Site.Name == "Linville Falls" | Site.Name == "Durham Armory" | Site.Name == "Leggett" | Site.Name == "Hattie Avenue" | Site.Name == "Clemmons Middle" | Site.Name == "Mendenhall School" | Site.Name == "Frying Pan Mountain" | Site.Name == "West Johnston Co." | Site.Name == "Garinger High School" | Site.Name == "Castle Hayne" | Site.Name == "Pitt Agri. Center" | Site.Name == "Bryson City" | Site.Name == "Millbrook School") %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>%
   group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
   summarise(meanAQI = mean(DAILY_AQI_VALUE), 
             meanlatitude = mean(SITE_LATITUDE), 
@@ -128,7 +133,9 @@ EPAair.processed.spread.summary <-
   group_by(Site.Name, Month, Year) %>%
   summarise(meanOzone = mean(Ozone), 
             meanPM2.5 = mean(PM2.5)) %>%
-  filter(!is.na(meanOzone) & !is.na(meanPM2.5))
+  filter(!is.na(meanOzone) & !is.na(meanPM2.5)
+         |!is.na(meanOzone) & is.na(meanPM2.5)
+         |is.na(meanOzone) & !is.na(meanPM2.5))
 
 #13
 dim(EPAair.processed.spread.summary)
