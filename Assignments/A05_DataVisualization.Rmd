@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Data Visualization"
-author: "Student Name"
+author: "Yikai Jing"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -33,16 +33,26 @@ the processed data file for the Niwot Ridge litter dataset (use the [`NEON_NIWO_
 
 ```{r}
 #1 
-
+getwd()
+library(tidyverse)
+library(cowplot)
+NCP <- read.csv("~/Environmental_Data_Analytics_2022/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+NIL <- read.csv("~/Environmental_Data_Analytics_2022/Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
 #2 
+class(NCP$sampledate)
+NCP$sampledate <- as.Date(NCP$sampledate)
+class(NCP$sampledate)
 
+class(NIL$collectDate)
+NIL$collectDate <- as.Date(NIL$collectDate)
+class(NIL$collectDate)
 ```
 ## Define your theme
 3. Build a theme and set it as your default theme.
 
 ```{r}
 #3
-
+theme_set(theme_classic())
 ```
 
 ## Create graphs
@@ -52,7 +62,14 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 ```{r}
 #4
-
+plot1 <- ggplot(NCP, aes(x = tp_ug, y = po4, color = lakename))+
+  geom_point()+
+  geom_smooth(method = "lm", colour="black")+ 
+  ylim(0, 50) +
+  ggtitle("Scatterplot of total phosphorus vs phosphate by lake") +
+  xlab("Total Phosphorus")+
+  ylab("Phosphate")
+print(plot1)
 ```
 
 
@@ -60,12 +77,46 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 ```{r}
 #5
+NCP$month <- as.factor(NCP$month)
 
+plot2a <- ggplot(NCP, aes(x = month, y = temperature_C, color = lakename))+
+  geom_boxplot() +
+  ggtitle("Boxplot of Lake Temperature by Month") +
+  xlab("Month")+
+  ylab("Temperature (Celsius)")
+print(plot2a)
+
+plot2b <- ggplot(NCP, aes(x = month, y = tp_ug, color = lakename))+
+  geom_boxplot() +
+  ggtitle("Boxplot of Lake Total Phosphorus by Month") +
+  xlab("Month")+
+  ylab("Total Phosphorus")
+print(plot2b)
+
+plot2c <- ggplot(NCP, aes(x = month, y = tn_ug, color = lakename))+
+  geom_boxplot() +
+  ggtitle("Boxplot of Lake Total Phosphate by Month") +
+  xlab("Month")+
+  ylab("Total Phosphate")
+print(plot2c)
+
+plot2 <- plot_grid(plot2a + theme(legend.position = "none"), 
+                   plot2b + theme(legend.position = "none"), 
+                   plot2c + theme(legend.position = "none"),
+                   labels = c("a", "b", "c"), 
+                   align = 'h', axis = 'l', nrow = 1)
+
+legend <- get_legend(
+  plot2a +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom"))
+
+plot_grid(plot2, legend, ncol = 1, rel_heights = c(1,0.1))
 ```
 
 Question: What do you observe about the variables of interest over seasons and between lakes? 
 
-> Answer: 
+> Answer: Compared to the Paul lake, Peter Lake usually have a higher tested amount of chemicals regardless of the season. The tested amount chemicals tend to increase as temperature rises and reach the peaks during the summer months, July and August.
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the "Needles" functional group. Plot the dry mass of needle litter by date and separate by NLCD class with a color aesthetic. (no need to adjust the name of each land use)
 
@@ -73,11 +124,27 @@ Question: What do you observe about the variables of interest over seasons and b
 
 ```{r}
 #6
+plot3 <-
+ggplot(subset(NIL, functionalGroup == 'Needles'),
+       aes(x = collectDate, y = dryMass, color = nlcdClass))+
+  geom_point()+
+  ggtitle("Scatterplot of Needle litter dry mass by date") +
+  xlab("Date")+
+  ylab("dryMass")
+print(plot3)
 
 #7
-
+plot4 <-
+  ggplot(subset(NIL, functionalGroup == 'Needles'),
+         aes(x = collectDate, y = dryMass))+
+  geom_point() +
+  facet_wrap(vars(nlcdClass), nrow = 3)+
+  ggtitle("Scatterplots of Needle litter dry mass by date") +
+  xlab("Date")+
+  ylab("dryMass")
+print(plot4)
 
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
-> Answer:
+> Answer: According to the bar chart, boxplot, and violin plot. None of the three could display the value of each single observation data as dot plot does. I think plot4 is more effective because it is easier to read, both seperately and together, and it can easily present the change within each of the classes.

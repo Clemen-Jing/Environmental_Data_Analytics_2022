@@ -27,6 +27,11 @@ print(Plot_text)
 
 ggsave("./Output/Plot_text.jpg",Plot_text, height = 4, width = 6, units = "in", dpi = 300)
 
+Plot_text2 <-
+ggplot(data=data.frame(x=0,y=0))+
+  geom_point(aes(x=x,y=y)) +
+  geom_text(x=0,y=0.025,label=expression(paste("Mean is ", digree,",", R[5],'=0.6')))
+print(Plot_text2)
 ```
 
 ## Import Datasets
@@ -38,6 +43,7 @@ library(ggridges)
 library(viridis)
 library(RColorBrewer)
 library(colormap)
+library(ggplot2)
 
 PeterPaul.chem.nutrients <- 
   read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
@@ -46,6 +52,8 @@ EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", strin
 EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 PeterPaul.chem.nutrients$sampledate <- as.Date(PeterPaul.chem.nutrients$sampledate, format = "%Y-%m-%d")
 
+theme_set(NULL)
+theme_set(theme_bw())
 ```
 
 
@@ -59,15 +67,41 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Plot surface temperatures by day of  year. 
 # Color your points by year, and facet by lake in two rows.
 # Change the ylab name
+Plot1 <- ggplot(data = PeterPaul.chem.nutrients)+
+  geom_point(aes(x = daynum, y = temperature_C, colours = year4)) +
+  facet_wrap(vars(lakename), nrow = 2)
+print(Plot1)
 
+PMplot.faceted <-
+  ggplot(EPAair, aes(x = Month, y = PM2.5, shape = as.factor(Year))) +
+  geom_point() +
+  facet_wrap(vars(Site.Name), nrow = 3)
+print(PMplot.faceted)
+
+tempvsdepth <- 
+  ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth, color = daynum)) +
+  geom_point() +
+  scale_y_reverse()
+print(tempvsdepth)
+
+Plot1 <-
+  ggplot(filter(PeterPaul.chem.nutrients, depth == 0))+
+  geom_point(aes(x = daynum, y = temperature_C, color = year4)) +
+  facet_wrap('lakename')+
+  ylab('Temperature(C)')
+print(Plot1)
 
 #2. 
 # Plot temperature by date. Color your points by depth.
 # Change the size of your point to 0.5
 # Change the color palette to magma and play with direction (+- 1), which one makes more sense?
 # Change x axis to include marker/labels every 5 years
-
-
+Plot2 <-
+  ggplot(PeterPaul.chem.nutrients) +
+  geom_point(aes(x = sampledate, y = depth), size = 0.5)+
+  scale_color_viridis(option = 'magma', direction = -1)+
+  scale_x_date(date_breaks = "5 years", date_labels = '%Y')
+print(Plot2)
 
 
 ```
@@ -81,8 +115,11 @@ Exercise: Plot relationships between air quality measurements
 # Plot AQI values for ozone by PM2.5, colored by latitude 
 # Make the points 50 % transparent
 # Add a line of best fit for the linear regression of these variables.
-
-
+Plot3 <-
+  ggplot(EPAair, aes(x = PM2.5, y = Ozone, color = meanLat)) +
+  geom_point(alpha = 0.5)+
+  geom_smooth(method = lm)
+print(Plot3)
 
 
 ```
@@ -96,8 +133,12 @@ Exercise: Plot distributions of AQI values for EPAair.
 # 4. 
 # Create several types of plots depicting PM2.5, divided by year. 
 # Choose which plot displays the data best and justify your choice. 
-
-
+Plot4 <- 
+  ggplot(EPAair, aes(x = PM2.5, y = as.factor(Year))) +
+  geom_density_ridges(aes(fill = as.factor(Year)))+
+  ylab('Year')+
+  labs(fill = 'Year')
+print(Plot4)
 
 ```
 
