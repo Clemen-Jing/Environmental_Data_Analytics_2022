@@ -229,6 +229,7 @@ GasPlants.utm <- st_transform(GasPlants,32617)
 
 #Have a look at the coordinate associated with the geometries
 EPAair.sf.utm$geometry[1]
+EPAair.sf.utm[2]
 
 #Plot the data
 ggplot() +
