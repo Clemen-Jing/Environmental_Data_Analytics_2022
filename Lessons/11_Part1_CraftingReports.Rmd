@@ -43,12 +43,13 @@ Lastly, this [website](https://rmarkdown.rstudio.com) give a great & thorough ov
 
 ## THE KNITTING PROCESS
 -   The knitting sequence
+
     ![knitting](../lessons/img/rmarkdownflow.png)
 
 * Knitting commands in code chunks:
- - `include = FALSE` - code is run, but neither code nor results appear in knitted file
- - `echo = FALSE`    - code not included in knitted file, but results are
- - `eval = FALSE`    - code is not run in the knitted file
+  - `include = FALSE` - code is run, but neither code nor results appear in knitted file
+  - `echo = FALSE`    - code not included in knitted file, but results are
+  - `eval = FALSE`    - code is not run in the knitted file
  - `message = FALSE` - messages do not appear in knitted file
  - `warning = FALSE` - warnings do not appear...
  - `fig.cap = "..."` - adds a caption to graphical results
@@ -63,12 +64,29 @@ See: <https://rmarkdown.rstudio.com> and class recording.
 
 ## WHY R MARKDOWN?
 
-<Fill in our discussion below with bullet points. Use italics and bold for emphasis (hint: use the cheat sheets or `Help` →`Markdown Quick Reference` to figure out how to make bold and italic text).> 
+<Fill in our discussion below with bullet points. Use italics and bold for emphasis (hint: use the cheat sheets or `Help` →`Markdown Quick Reference` to figure out how to make bold and italic text).>
 
+ * Enable organization of R code
+ * Different coding language
+ * Managing how code/products is displayed
+- Add formatted text along with our code
+- All text based - good for reproducibility
+Both *and -work but remeber there shoud be a vacant line before the list.
 
 ## TEXT EDITING CHALLENGE
 
 Create a table below that details the example datasets we have been using in class. The first column should contain the names of the datasets and the second column should include some relevant information about the datasets. (Hint: use the cheat sheets to figure out how to make a table in Rmd)
+
+```{r}
+library(knitr)
+
+file <- data.frame("file name"<- c("EPAair_O3_NC2018_raw" , "EPAair_O3_NC2019_raw", "EPAair_PM25_NC2018_raw", "EPAair_PM25_NC2019_raw"),
+                   "file description" <- c("9737 rows, 20 columns"," 10592 rows, 20 columns","8983 rows, 20 columns", "8581 rows, 20 columns"))
+
+kable(file, format = "simple", col.names = c('File Name', 'File Description'),
+      caption = "Example Dataset information")
+```
+
 
 
 ## R CHUNK EDITING CHALLENGE
@@ -76,6 +94,11 @@ Create a table below that details the example datasets we have been using in cla
 ### Installing packages
 
 Create an R chunk below that installs the package `knitr`. Instead of commenting out the code, customize the chunk options such that the code is not evaluated (i.e., not run).
+
+```{r Install Knitr}
+library(knitr)
+kable(cars, caption = "My cars table")
+```
 
 
 ### Setup
@@ -86,6 +109,23 @@ Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, a
 
 Customize the chunk options such that the code is run but is not displayed in the final document.
 
+```{r include=FALSE}
+getwd()
+library(tidyverse)
+library(knitr)
+library(lubridate)
+library(ggplot2)
+
+mytheme <- theme_classic(base_size = 12) +
+  theme(axis.text = element_text(color = "black"),
+        legend.position = "top")
+
+water <- read.csv('~/Environmental_Data_Analytics_2022/Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv', stringsAsFactors = TRUE)
+water$sampledate <- as.Date(water$sampledate, "%m/%d/%Y")
+
+```
+
+
 
 ### Data Exploration, Wrangling, and Visualization
 
@@ -94,17 +134,81 @@ Create an R chunk below to create a processed dataset do the following operation
 -   Include all columns except lakeid, depth_id, and comments
 -   Include only surface samples (depth = 0 m)
 -   Drop rows with missing data
+```{r}
+water.processed <- water %>%
+  select(lakename, year4, daynum, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
+  filter(depth == "0") %>%
+  mutate(Year = year(sampledate), Month = month(sampledate)) %>%
+  mutate(Date = as.Date(paste(Year, Month, 1, sep = "-"))) %>%
+  drop_na()
+
+```
+
 
 Create a second R chunk to create a summary dataset with the mean, minimum, maximum, and standard deviation of total nitrogen concentrations for each lake. Create a second summary dataset that is identical except that it evaluates total phosphorus. Customize the chunk options such that the code is run but not displayed in the final document.
 
+```{r include=FALSE}
+water.tn <- water.processed %>%
+  group_by(lakename) %>%
+  summarise(mean_tn = mean(tn_ug), 
+            minimum_tn = min(tn_ug),
+            maximum_tn = max(tn_ug),
+            sd_tn = sd(tn_ug))
+  
+water.tp <- water.processed %>%
+  group_by(lakename) %>%
+  summarise(mean_tp = mean(tp_ug), 
+            minimum_tp = min(tp_ug),
+            maximum_tp = max(tp_ug),
+            sd_tp = sd(tp_ug))
+```
+
+
 Create a third R chunk that uses the function `kable` in the knitr package to display two tables: one for the summary dataframe for total N and one for the summary dataframe of total P. Use the `caption = " "` code within that function to title your tables. Customize the chunk options such that the final table is displayed but not the code used to generate the table.
 
+```{r echo=FALSE}
+kable(water.tn, caption = "Total Nitrogen of Lakes")
+kable(water.tp, caption = "Total Phosphorus of Lakes")
+```
+
+
 Create a fourth and fifth R chunk that generates two plots (one in each chunk): one for total N over time with different colors for each lake, and one with the same setup but for total P. Decide which geom option will be appropriate for your purpose, and select a color palette that is visually pleasing and accessible. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, customize the chunk options such that the figures are aligned on the left side of the page. Lastly, add a fig.cap chunk option to add a caption (title) to your plot that will display underneath the figure.
+
+```{r echo=FALSE}
+#| fig.align = 'left', fig.cap = 'Total Nitrogen Level of Lakes 1991-1999'
+ggplot(water.processed, aes(x = sampledate, y = tn_ug, color = lakename)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  labs(
+    title ='Total N over time',
+    x = 'Date',
+    y = expression(paste('Total N (',mu,'g)')),
+    color = "Lake"
+    ) +
+  mytheme
+
+```
+
+```{r echo=FALSE}
+#| fig.align = 'left' , fig.cap = 'Total Phosphorus Level of Lakes 1991-1999'
+ggplot(water.processed, aes(x = sampledate, y = tp_ug, color = lakename)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  labs(
+    title ='Total P over time',
+    x = 'Date',
+    y = expression(paste('Total P (',mu,'g)')),
+    color = "Lake"
+    ) +
+  mytheme
+```
 
 
 ### Communicating results
 
 Write a paragraph describing your findings from the R coding challenge above. This should be geared toward an educated audience but one that is not necessarily familiar with the dataset. Then insert a horizontal rule below the paragraph. Below the horizontal rule, write another paragraph describing the next steps you might take in analyzing this dataset. What questions might you be able to answer, and what analyses would you conduct to answer those questions?
+
+> Based on Table 1 and 2, we can see that the nutrient level of the lakes varied a lot. Out of the total 8 lakes that were collected data from, East Long lake, West long lake, Central long lake, and Peters lake have a higher mean of nutrients from 1991 to 1999. However, from the two figures we can see that all lakes presented similar level of nutrients, both Nitrogen and Phosphorus, at 1991 while these four specific lakes experienced a much more significant growth in the nutrient level as the date approaches 1999. By the time of 1999, East Long lake is having a significantly higher level of both Nitrogen and Phosphorus compared with other lakes.
 
 
 ## KNIT YOUR PDF

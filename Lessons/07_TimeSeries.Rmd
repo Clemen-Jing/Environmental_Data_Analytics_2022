@@ -90,6 +90,10 @@ Let's start by removing the NAs and splitting the dataset into the early and lat
 EnoDischarge.complete <- EnoDischarge %>%
   drop_na(discharge.mean)
 
+ggplot(EnoDischarge.complete, aes(x = datetime, y = discharge.mean)) +
+  geom_line() +
+  labs(x = "", y = expression("Discharge (ft"^3*"/s)"))
+
 EnoDischarge.early <- EnoDischarge.complete %>%
   filter(datetime < as.Date("1985-01-01"))
 
@@ -116,6 +120,8 @@ Note: time series objects must be equispaced. In our case, we have daily data wi
 
 ```{r}
 EnoDischarge.late_ts <- ts(EnoDischarge.late$discharge.mean, start = c(1985,1), frequency = 365)
+#or EnoDischarge.late_ts <- ts(EnoDischarge.late[[8]], start = c(1985,1), frequency = 365)
+
 ```
 
 The `stl` function decomposes the time series object into its component parts. We must specify that the window for seasonal extraction is either "periodic" or a specific number of at least 7. The decomposition proceeds through a loess (locally estimated scatterplot smoothing) function.
@@ -179,12 +185,15 @@ The Eno River discharge data doesn't have any short periods of missing data, so 
 ```{r}
 head(wind_data)
 summary(wind_data$AWND)
+#one data in NA's
 
 # Adding new column with no missing obs, just for illustration purpose
 # In real applications you will simply replace NAs
 wind_data_clean <- 
   wind_data %>% 
   mutate( AWND.clean = zoo::na.approx(AWND) )
+#zoo::na.approx: there is a same name function in other package, so remember add zoo::
+#this function is to give a value to the NA
 
 summary(wind_data_clean$AWND.clean)
 #Note the NA is gone
